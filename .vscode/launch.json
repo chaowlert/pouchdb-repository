@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "request": "launch",
+      "name": "Run mocha",
+      "type": "node",
+      /* Globally installed mocha */
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "stopOnEntry": true,
+      /* Specify which are the file you want the runner to pick up. */
+      "args": [
+        "build/test/**/*.js"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": null,
+      "env": {
+        "NODE_ENV": "production"
+      },
+      /* If you are using Typescript and you alread have sourcemaps generated in                
+             * the test folder, simple specifying this flag will give the luxry 
+             * of debugging the typescript test instead of JavaScript.
+             */
+      "sourceMaps": true,
+      /* This is the directory where your tests are located.*/
+      "outDir": "${workspaceRoot}/build/"
+    }
+  ]
+}

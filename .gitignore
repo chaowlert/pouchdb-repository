@@ -1,0 +1,15 @@
+# Coverage directory used by tools like istanbul
+/coverage
+
+# Dependency directory
+/node_modules
+/bower_components
+/typings
+
+#build
+/build
+/dist
+/docs
+
+#log
+*.log
