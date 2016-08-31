@@ -1,7 +1,7 @@
 {
   "name": "pouchdb-repository",
   "description": "Simple repository for PouchDb",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [

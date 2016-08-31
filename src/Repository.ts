@@ -12,8 +12,14 @@ export class Repository<T extends pouchdb.api.methods.NewDoc> {
         if (options.auto_compaction == null) {
             options.auto_compaction = true;
         }
+        if (options['namePrefix']) {
+            name = options['namePrefix'] + name;
+        }
+        if (!options['name']) {
+            options['name'] = name;
+        }
 
-        this.db = new PouchDB(name, options);
+        this.db = new PouchDB(<pouchdb.options.ctor.LocalDbWithName>options);
         this.init = this.db;
     }
 

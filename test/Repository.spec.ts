@@ -72,7 +72,7 @@ interface Foo {
 
 class FooRepository extends Repository<Foo> {
     constructor() {
-        super('foo', { db: memdown });
+        super('foo', { db: memdown, namePrefix: './repositories/' });
 
         this.init = this.init.then(() =>
             this.db.createIndex({
