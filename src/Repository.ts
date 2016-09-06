@@ -1,4 +1,4 @@
-import * as PouchDB from 'pouchdb';
+import * as PouchDB from 'pouchdb-core';
 import * as find from 'pouchdb-find';
 
 PouchDB.plugin(find);
@@ -12,15 +12,15 @@ export class Repository<T extends pouchdb.api.methods.NewDoc> {
         if (options.auto_compaction == null) {
             options.auto_compaction = true;
         }
-        if (options['namePrefix']) {
-            name = options['namePrefix'] + name;
+        if (options['prefix']) {
+            name = options['prefix'] + name;
         }
         if (!options['name']) {
             options['name'] = name;
         }
 
         this.db = new PouchDB(<pouchdb.options.ctor.LocalDbWithName>options);
-        this.init = this.db;
+        this.init = Promise.resolve(this.db);
     }
 
     async save(item: T) {

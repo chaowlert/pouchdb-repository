@@ -20,7 +20,8 @@ var gulp = require('gulp'),
     babel = require('gulp-babel'),
     clean = require('gulp-clean'),
     listfiles = require('gulp-listfiles'),
-    ngAnnotate = require('gulp-ng-annotate');
+    ngAnnotate = require('gulp-ng-annotate'),
+    replace = require('gulp-replace-task');
 
 //******************************************************************************
 //* LINT
@@ -32,8 +33,8 @@ gulp.task('lint', function () {
         'test/**/*.ts',
         '!src/models/**/*.ts'
     ])
-        .pipe(tslint())
-        .pipe(tslint.report('verbose', { emitError: true }));
+        .pipe(tslint({ formatter: 'verbose' }))
+        .pipe(tslint.report({ emitError: true }));
 });
 
 //******************************************************************************
@@ -112,14 +113,20 @@ var tsSrcProject = tsc.createProject('tsconfig.json');
 
 gulp.task('build-src', function () {
     return gulp.src(['src/**/*.ts'], { base: './' })
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(tsc(tsSrcProject))
         .on('error', function (err) {
             process.exit(1);
         })
         .js
         .pipe(babel({ presets: ['es2015-loose', 'stage-3'] }))
-        .pipe(sourcemaps.write('./'))
+        .pipe(replace({
+           patterns: [
+               { match: /(function _classCallCheck)/, replacement: '/* istanbul ignore next */\n$1' },
+               { match: /(var __awaiter)/, replacement: '/* istanbul ignore next */\n$1' }
+           ]
+        }))
+        //.pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('build/'));
 });
 
@@ -127,7 +134,7 @@ var tsTestProject = tsc.createProject('tsconfig.json', { removeComments: false }
 
 gulp.task('build-test', function () {
     return gulp.src(['test/**/*.ts'], { base: './' })
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(tsc(tsTestProject))
         .on('error', function (err) {
             process.exit(1);
@@ -135,7 +142,7 @@ gulp.task('build-test', function () {
         .js
         .pipe(babel({ presets: ['es2015-loose', 'stage-3'] }))
         .pipe(ngAnnotate({ add: true, remove: true, singleQuotes: true }))
-        .pipe(sourcemaps.write('./'))
+        //.pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('build/'));
 });
 

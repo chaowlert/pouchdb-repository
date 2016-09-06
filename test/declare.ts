@@ -1,4 +1,4 @@
-declare let obj: any;
-declare module 'memdown' {
+declare module 'pouchdb-adapter-memory' {
+    let obj: any;
     export = obj;
 }

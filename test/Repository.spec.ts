@@ -3,8 +3,11 @@
 
 import {Repository} from '../src/index';
 import {expect} from 'chai';
-import * as memdown from 'memdown';
+import * as PouchDB from 'pouchdb-core';
+import * as memory from 'pouchdb-adapter-memory';
 import 'babel-polyfill';
+
+PouchDB.plugin(memory);
 
 describe('Repository', function () {
     it('should be able to perform basic operations', async function () {
@@ -72,7 +75,7 @@ interface Foo {
 
 class FooRepository extends Repository<Foo> {
     constructor() {
-        super('foo', { db: memdown, namePrefix: './repositories/' });
+        super('foo', { adapter: 'memory' });
 
         this.init = this.init.then(() =>
             this.db.createIndex({
