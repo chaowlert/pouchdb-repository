@@ -12,9 +12,6 @@ export class Repository<T extends pouchdb.api.methods.NewDoc> {
         if (options.auto_compaction == null) {
             options.auto_compaction = true;
         }
-        if (options['prefix']) {
-            name = options['prefix'] + name;
-        }
         if (!options['name']) {
             options['name'] = name;
         }

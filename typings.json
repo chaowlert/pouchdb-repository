@@ -3,8 +3,10 @@
   "dependencies": {},
   "globalDependencies": {},
   "globalDevDependencies": {
-    "chai": "registry:dt/chai#3.4.0+20160317120654",
-    "mocha": "registry:dt/mocha#2.2.5+20160317120654",
-    "sinon": "registry:dt/sinon#1.16.0+20160517064723"
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353"
+  },
+  "devDependencies": {
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   }
 }

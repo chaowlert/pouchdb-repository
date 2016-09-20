@@ -12,7 +12,11 @@
     "removeComments": true,
     "noLib": false,
     "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": false
+    "suppressImplicitAnyIndexErrors": false,
+    "lib": [
+        "dom",
+        "es2015"
+    ]
   },
   "exclude": [
     "node_modules",
