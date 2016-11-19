@@ -1,5 +1,5 @@
 # pouchdb-repository
-Simple repository for PouchDb
+Typescript repository for PouchDB. This library includes type definitions for PouchDB including strong type repository class.
 
 ## Install
 
@@ -78,7 +78,7 @@ All specified objects will be removed from db.
 
 #### Query
 
-`Query` options is from [pouchdb-find](https://github.com/nolanlawson/pouchdb-find). This library provides typing definition.
+`Query` options is from [pouchdb-find](https://github.com/nolanlawson/pouchdb-find). This library also includes typing definition.
 
 ```
 let results = await repo.query({

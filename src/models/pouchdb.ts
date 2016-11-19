@@ -571,7 +571,7 @@ declare module pouchdb {
                      * an empty results array, and the `change` event is the only way to get the event.
                      * @default true
                      */
-                    returnDocs?: boolean;
+                    return_docs?: boolean;
                     /**
                      * Available for http databases. This configures how many changes to fetch at a
                      * time. Increasing this can reduce the number of requests made.

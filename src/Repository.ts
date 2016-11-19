@@ -17,7 +17,7 @@ export class Repository<T extends pouchdb.api.methods.NewDoc> {
         }
 
         this.db = new PouchDB(<pouchdb.options.ctor.LocalDbWithName>options);
-        this.init = Promise.resolve(this.db);
+        this.init = this.db.info();
     }
 
     async save(item: T) {
