@@ -10,19 +10,21 @@
     "declaration": false,
     "removeComments": true,
     "noLib": false,
-    "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": false,
     "importHelpers": true,
     "lib": [
         "dom",
         "es2015"
     ],
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
     "noImplicitAny": true,
-    "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": false
   },
   "include": [
     "src/**/*.ts"
