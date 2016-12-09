@@ -8,20 +8,23 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": false,
-    "noImplicitAny": true,
     "removeComments": true,
     "noLib": false,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": false,
+    "importHelpers": true,
     "lib": [
         "dom",
         "es2015"
-    ]
+    ],
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
-  "exclude": [
-    "node_modules",
-    "typings",
-    "build",
-    "dist"
+  "include": [
+    "src/**/*.ts"
   ]
 }

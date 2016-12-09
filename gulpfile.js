@@ -51,7 +51,7 @@ var tsDistProject = tsc.createProject('tsconfig.json', {
 
 gulp.task('build-dist', function () {
     var tsResult = gulp.src('src/**/*.ts')
-        .pipe(tsc(tsDistProject))
+        .pipe(tsDistProject())
         .on('error', function (err) {
             process.exit(1);
         });
@@ -80,10 +80,10 @@ gulp.task('dist', function (cb) {
 gulp.task('listfiles-model', function () {
     return gulp.src([
         'src/models/**.ts',
-        '!src/models/_models.ts'
+        '!src/models/index.ts'
     ], { read: false })
         .pipe(listfiles({
-            filename: '_models.ts',
+            filename: 'index.ts',
             prefix: 'import \'./',
             postfix: '\';',
             replacements: [{
@@ -104,7 +104,7 @@ gulp.task('listfiles-index', function () {
             filename: 'index.ts',
             prefix: 'export * from \'./',
             postfix: '\';',
-            banner: 'import \'./models/_models\';',
+            banner: 'import \'./models\';',
             replacements: [{
                 pattern: /\.[^/.]+$/,
                 replacement: ''
@@ -121,7 +121,7 @@ var tsSrcProject = tsc.createProject('tsconfig.json', {
 gulp.task('build-src', function () {
     return gulp.src(['src/**/*.ts'], { base: './' })
         .pipe(sourcemaps.init())
-        .pipe(tsc(tsSrcProject))
+        .pipe(tsSrcProject())
         .on('error', function (err) {
             process.exit(1);
         })
@@ -139,7 +139,7 @@ var tsTestProject = tsc.createProject('tsconfig.json', {
 gulp.task('build-test', function () {
     return gulp.src(['test/**/*.ts'], { base: './' })
         .pipe(sourcemaps.init())
-        .pipe(tsc(tsTestProject))
+        .pipe(tsTestProject())
         .on('error', function (err) {
             process.exit(1);
         })
@@ -169,7 +169,8 @@ gulp.task('istanbul:hook', function () {
     return gulp.src([
         'build/src/**/*.js',
         '!build/src/index.js',
-        '!build/src/models/_models.js'])
+        '!build/src/models/index.js'
+    ])
         // Covering files
         .pipe(istanbul())
         // Force `require` to return covered files

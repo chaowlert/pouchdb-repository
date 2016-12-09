@@ -40,7 +40,9 @@ export class Repository<T extends pouchdb.api.methods.NewDoc> {
         try {
             let result = await this.db.get(id, options);
             return <any>result;
-        } catch (e) { ; }
+        } catch (e) { 
+            return undefined;
+        }
     }
 
     remove(item: T) {
