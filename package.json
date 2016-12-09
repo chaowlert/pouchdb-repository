@@ -1,7 +1,7 @@
 {
   "name": "pouchdb-repository",
   "description": "Simple repository for PouchDb",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "gulp",
-    "prepublish": "typings install"
+    "prepublish": "typings install & gulp prepublish"
   },
   "repository": {
     "type": "git",
@@ -34,8 +34,8 @@
     "gulp-istanbul": "^1.1.1",
     "gulp-istanbul-report": "0.0.1",
     "gulp-listfiles": "^0.1.0",
+    "gulp-load-plugins": "^1.4.0",
     "gulp-mocha": "^3.0.1",
-    "gulp-ng-annotate": "^2.0.0",
     "gulp-replace-task": "^0.11.0",
     "gulp-sourcemaps": "^1.9.1",
     "gulp-tslint": "^7.0.1",

@@ -8,18 +8,9 @@
 require('harmonize')();
 
 var gulp = require('gulp'),
-    clean = require('gulp-clean'),
-    istanbul = require('gulp-istanbul'),
-    istanbulReport = require('gulp-istanbul-report'),
-    listfiles = require('gulp-listfiles'),
-    mocha = require('gulp-mocha'),
-    ngAnnotate = require('gulp-ng-annotate'),
-    replace = require('gulp-replace-task'),
-    sourcemaps = require('gulp-sourcemaps'),
-    tslint = require('gulp-tslint'),
-    typedoc = require('gulp-typedoc'),
-    tsc = require('gulp-typescript'),
+    $ = require('gulp-load-plugins')(),
     merge = require('merge2'),
+    path = require('path'),
     remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul'),
     runSequence = require('run-sequence');
 
@@ -33,8 +24,8 @@ gulp.task('lint', function () {
         'test/**/*.ts',
         '!src/models/**/*.ts'
     ])
-        .pipe(tslint({ formatter: 'verbose' }))
-        .pipe(tslint.report({ emitError: true }));
+        .pipe($.tslint({ formatter: 'verbose' }))
+        .pipe($.tslint.report({ emitError: true }));
 });
 
 //******************************************************************************
@@ -42,11 +33,10 @@ gulp.task('lint', function () {
 //******************************************************************************
 var pkg = require('./package.json');
 
-var tsDistProject = tsc.createProject('tsconfig.json', {
+var tsDistProject = $.typescript.createProject('tsconfig.json', {
     target: 'es5',
     declaration: true,
     stripInternal: true,
-    typescript: require('typescript')
 });
 
 gulp.task('build-dist', function () {
@@ -63,7 +53,7 @@ gulp.task('build-dist', function () {
 
 gulp.task('clean-dist', function () {
     return gulp.src('dist', { read: false })
-        .pipe(clean());
+        .pipe($.clean());
 });
 
 gulp.task('dist', function (cb) {
@@ -82,7 +72,7 @@ gulp.task('listfiles-model', function () {
         'src/models/**.ts',
         '!src/models/index.ts'
     ], { read: false })
-        .pipe(listfiles({
+        .pipe($.listfiles({
             filename: 'index.ts',
             prefix: 'import \'./',
             postfix: '\';',
@@ -100,7 +90,7 @@ gulp.task('listfiles-index', function () {
         '!src/index.ts',
         '!src/models/**.ts'
     ], { read: false })
-        .pipe(listfiles({
+        .pipe($.listfiles({
             filename: 'index.ts',
             prefix: 'export * from \'./',
             postfix: '\';',
@@ -113,45 +103,40 @@ gulp.task('listfiles-index', function () {
         .pipe(gulp.dest('src/'));
 });
 
-var tsSrcProject = tsc.createProject('tsconfig.json', {
+var tsSrcProject = $.typescript.createProject('tsconfig.json', {
     target: 'es5',
-    typescript: require('typescript')
 });
 
 gulp.task('build-src', function () {
     return gulp.src(['src/**/*.ts'], { base: './' })
-        .pipe(sourcemaps.init())
+        .pipe($.sourcemaps.init())
         .pipe(tsSrcProject())
         .on('error', function (err) {
             process.exit(1);
         })
         .js
-        .pipe(sourcemaps.write('./', {sourceRoot: './'}))
+        .pipe($.sourcemaps.write('./', { includeContent: false }))
         .pipe(gulp.dest('build/'));
 });
 
-var tsTestProject = tsc.createProject('tsconfig.json', {
+var tsTestProject = $.typescript.createProject('tsconfig.json', {
     target: 'es5',
     removeComments: false,
-    typescript: require('typescript')
 });
 
 gulp.task('build-test', function () {
     return gulp.src(['test/**/*.ts'], { base: './' })
-        .pipe(sourcemaps.init())
         .pipe(tsTestProject())
         .on('error', function (err) {
             process.exit(1);
         })
         .js
-        .pipe(ngAnnotate({ add: true, remove: true, singleQuotes: true }))
-        .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('build/'));
 });
 
 gulp.task('clean-build', function () {
     return gulp.src('build', { read: false })
-        .pipe(clean());
+        .pipe($.clean());
 });
 
 gulp.task('mocha', function () {
@@ -159,9 +144,10 @@ gulp.task('mocha', function () {
         'node_modules/reflect-metadata/Reflect.js',
         'build/test/**/*.js'
     ])
-        .pipe(mocha({ ui: 'bdd' }))
-        .pipe(istanbul.writeReports({
-            reporters: ['json']
+        .pipe($.mocha({ ui: 'bdd' }))
+        .pipe($.istanbul.writeReports({
+            reporters: ['json'],
+            coverageVariable: '__coverage__'
         }));
 });
 
@@ -169,35 +155,53 @@ gulp.task('istanbul:hook', function () {
     return gulp.src([
         'build/src/**/*.js',
         '!build/src/index.js',
-        '!build/src/models/index.js'
-    ])
+        '!build/src/models/**.js'], { base: './' })
         // Covering files
-        .pipe(istanbul())
-        // Force `require` to return covered files
-        .pipe(istanbul.hookRequire());
+        .pipe($.istanbul({
+            coverageVariable: '__coverage__',
+            preserveComments: true,
+            noCompact: true,
+            noAutoWrap: true
+        }))
+        .pipe(gulp.dest('./'));
 });
 
 gulp.task('remap-istanbul', function () {
     return gulp.src('coverage/coverage-final.json')
-        .pipe(remapIstanbul())
-        .pipe(istanbulReport({
+        .pipe(remapIstanbul({
+            basePath: path.resolve(__dirname, './build')
+        }))
+        .pipe($.istanbulReport({
             dir: './coverage',
             reporters: ['lcov', 'json', 'text', 'text-summary']
         }));
 });
 
-gulp.task('test', function (cb) {
-    runSequence('istanbul:hook', 'mocha', 'remap-istanbul', cb);
-});
-
-gulp.task('build', function (cb) {
+gulp.task('prepare', function(cb) {
     runSequence(
         'lint',
         'clean-build',
         'listfiles-model',
         'listfiles-index',
+        cb);
+});
+
+gulp.task('test', function (cb) {
+    runSequence(
+        'prepare',
         'build-src',
-        'build-test', cb);
+        'istanbul:hook',
+        'build-test',
+        'mocha',
+        'remap-istanbul',
+        cb);
+});
+
+gulp.task('build', function (cb) {
+    runSequence(
+        'prepare',
+        'build-src',
+        cb);
 });
 
 //******************************************************************************
@@ -209,7 +213,7 @@ gulp.task('document', function () {
             'src/**/**.ts',
             'typings/index.d.ts'
         ])
-        .pipe(typedoc({
+        .pipe($.typedoc({
             // TypeScript options (see typescript docs)
             target: 'es6',
             module: 'commonjs',
@@ -225,17 +229,18 @@ gulp.task('document', function () {
             out: './docs',
             name: pkg.name,
             version: true,
-            theme: 'minimal'
+            //theme: 'minimal'
         }));
 });
 
 //******************************************************************************
 //* DEFAULT
 //******************************************************************************
-gulp.task('default', function (cb) {
+gulp.task('default', ['test']);
+
+gulp.task('prepublish', function (cb) {
     runSequence(
-        'build',
-        'test',
+        'default',
         'dist',
         cb);
 });
