@@ -1,2 +1,2 @@
-import './models';
+import './models/index';
 export * from './Repository';

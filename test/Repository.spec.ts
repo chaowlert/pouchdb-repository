@@ -1,11 +1,10 @@
-/// <reference path="../typings/index.d.ts" />
-/// <reference path="declare.ts" />
+import 'babel-polyfill';
+
+import * as PouchDB from 'pouchdb-core';
+import * as memory from 'pouchdb-adapter-memory';
 
 import {Repository} from '../src/index';
 import {expect} from 'chai';
-import * as PouchDB from 'pouchdb-core';
-import * as memory from 'pouchdb-adapter-memory';
-import 'babel-polyfill';
 
 PouchDB.plugin(memory);
 

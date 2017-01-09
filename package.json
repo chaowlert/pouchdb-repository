@@ -1,7 +1,7 @@
 {
   "name": "pouchdb-repository",
-  "description": "Simple repository for PouchDb",
-  "version": "0.4.0",
+  "description": "Typescript repository for PouchDB. This library includes type definitions for PouchDB including strong type repository class.",
+  "version": "0.4.1",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "gulp",
-    "prepublish": "typings install & gulp prepublish"
+    "prepublish": "gulp prepublish"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,9 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.36",
+    "@types/sinon": "^1.16.34",
     "babel-polyfill": "^6.16.0",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
