@@ -8,15 +8,15 @@ import {expect} from 'chai';
 
 PouchDB.plugin(memory);
 
-describe('Repository', function () {
-    it('should be able to perform basic operations', async function () {
+describe('Repository', () => {
+    it('should be able to perform basic operations', async () => {
         let repo = new FooRepository();
 
         //wait for initialize
         await repo.init;
 
         //create record
-        let foo1: Foo = { _id: 'a', name: 'A' };
+        let foo1: IFoo = { _id: 'a', name: 'A' };
         await repo.save(foo1);
         expect(foo1._rev).is.not.undefined;
 
@@ -29,7 +29,7 @@ describe('Repository', function () {
         expect(foo1.name).equals('B');
 
         //add more
-        let foos: Foo[] = [
+        let foos: IFoo[] = [
             { _id: 'a', name: 'A' },
             { _id: 'b', name: 'B' }
         ];
@@ -65,14 +65,14 @@ describe('Repository', function () {
     });
 });
 
-interface Foo {
+interface IFoo {
     _id: string;
     name: string;
     _rev?: string;
     _deleted?: boolean;
 }
 
-class FooRepository extends Repository<Foo> {
+class FooRepository extends Repository<IFoo> {
     constructor() {
         super('foo', { adapter: 'memory' });
 
