@@ -2,9 +2,10 @@ import 'babel-polyfill';
 
 import * as PouchDB from 'pouchdb-core';
 import * as memory from 'pouchdb-adapter-memory';
+import * as sinon from 'sinon';
 
 import {Repository} from '../src/index';
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 PouchDB.plugin(memory);
 
@@ -31,14 +32,21 @@ describe('Repository', () => {
         //add more
         let foos: IFoo[] = [
             { _id: 'a', name: 'A' },
-            { _id: 'b', name: 'B' }
+            { _id: 'b', name: 'B' },
+            { _id: 'c', name: 'C' },
+            { _id: 'd', name: 'D' }
         ];
-        await repo.saveAll(foos);
+        let spy = sinon.spy(repo.db, 'bulkDocs');
+        await repo.saveAll(foos, 2);
+        expect(spy.callCount).equals(3); //save 2 chucks + _id=a will be retry because it is already in db
+        spy.restore();
 
         //get all
         foos = await repo.query();
         expect(foos[0].name).equals('A');
         expect(foos[1].name).equals('B');
+        expect(foos[2].name).equals('C');
+        expect(foos[3].name).equals('D');
 
         //query
         foos = await repo.query({
@@ -46,7 +54,7 @@ describe('Repository', () => {
                 name: { $gte: 'B' }
             }
         });
-        expect(foos.length).equals(1);
+        expect(foos.length).equals(3);
         expect(foos[0].name).equals('B');
 
         //remove record

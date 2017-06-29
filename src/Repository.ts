@@ -50,9 +50,9 @@ export class Repository<T extends PouchEntity> {
         return this.save(item);
     }
 
-    async saveAll(items: T[]) {
+    private async _saveAll(items: T[]) {
         //bulk update
-        let results: PouchDB.Core.Response[] | ErrorResponse[] = await this.db.bulkDocs(items);
+        let results: (PouchDB.Core.Response | ErrorResponse)[] = await this.db.bulkDocs(items);
 
         //update rev & get conflicted indexes
         let retryIndexes: number[] = [];
@@ -69,9 +69,6 @@ export class Repository<T extends PouchEntity> {
                 item._id = result.id;
                 item._rev = result.rev;
             }
-        }
-        if (hasError) {
-            throw results;
         }
 
         //retry
@@ -94,13 +91,26 @@ export class Repository<T extends PouchEntity> {
                     item._rev = result.rev;
                 }
             }
-            if (hasError) {
-                throw results;
-            }
         }
+
+        return { results, hasError };
 
         function isError(obj: ErrorResponse): obj is ErrorResponse {
             return obj.error;
+        }
+    }
+
+    async saveAll(items: T[], chunkSize = 500) {
+        let allResults: (PouchDB.Core.Response | ErrorResponse)[] = [];
+        let allHasError = false;
+        for (let i = 0; i < items.length; i += chunkSize) {
+            let chunk = items.slice(i, i + chunkSize);
+            let { hasError, results } = await this._saveAll(chunk);
+            allResults.push(...results);
+            allHasError = allHasError || hasError;
+        }
+        if (allHasError) {
+            throw allResults;
         }
     }
 
