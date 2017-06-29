@@ -37,7 +37,8 @@ describe('Repository', () => {
             { _id: 'd', name: 'D' }
         ];
         let spy = sinon.spy(repo.db, 'bulkDocs');
-        await repo.saveAll(foos, 2);
+        repo.saveAllChunkSize = 2;
+        await repo.saveAll(foos);
         expect(spy.callCount).equals(3); //save 2 chucks + _id=a will be retry because it is already in db
         spy.restore();
 

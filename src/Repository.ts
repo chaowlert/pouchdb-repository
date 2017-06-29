@@ -4,7 +4,7 @@ import * as find from 'pouchdb-find';
 PouchDB.plugin(find);
 
 export type PouchEntity = { _id: string, _rev?: string, _deleted?: boolean };
-type ErrorResponse = { status?: number, error?: boolean };
+type ErrorResponse = { status?: number, error?: boolean, doc?: any };
 
 export class Repository<T extends PouchEntity> {
     db: PouchDB.Database<T>;
@@ -56,15 +56,17 @@ export class Repository<T extends PouchEntity> {
 
         //update rev & get conflicted indexes
         let retryIndexes: number[] = [];
-        let hasError = false;
+        let errors: ErrorResponse[] = [];
         for (let i = 0; i < items.length; i++) {
             let result = results[i];
             let item = items[i];
             if (isError(result)) {
                 if (result.status !== 409) {
-                    hasError = true;
+                    result.doc = item;
+                    errors.push(result);
+                } else {
+                    retryIndexes.push(i);
                 }
-                retryIndexes.push(i);
             } else {
                 item._id = result.id;
                 item._rev = result.rev;
@@ -86,31 +88,31 @@ export class Repository<T extends PouchEntity> {
                 let index = retryIndexes[i];
                 results[index] = result;
                 if (isError(result)) {
-                    hasError = true;
+                    result.doc = item;
+                    errors.push(result);
                 } else {
                     item._rev = result.rev;
                 }
             }
         }
 
-        return { results, hasError };
+        return errors;
 
         function isError(obj: ErrorResponse): obj is ErrorResponse {
             return obj.error;
         }
     }
 
-    async saveAll(items: T[], chunkSize = 500) {
-        let allResults: (PouchDB.Core.Response | ErrorResponse)[] = [];
-        let allHasError = false;
-        for (let i = 0; i < items.length; i += chunkSize) {
-            let chunk = items.slice(i, i + chunkSize);
-            let { hasError, results } = await this._saveAll(chunk);
-            allResults.push(...results);
-            allHasError = allHasError || hasError;
+    saveAllChunkSize = 500;
+    async saveAll(items: T[]) {
+        let errors: ErrorResponse[] = [];
+        for (let i = 0; i < items.length; i += this.saveAllChunkSize) {
+            let chunk = items.slice(i, i + this.saveAllChunkSize);
+            let chunkErrors = await this._saveAll(chunk);
+            errors.push(...chunkErrors);
         }
-        if (allHasError) {
-            throw allResults;
+        if (errors.length) {
+            throw errors;
         }
     }
 

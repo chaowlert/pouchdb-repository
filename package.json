@@ -1,7 +1,7 @@
 {
   "name": "pouchdb-repository",
   "description": "Typescript repository for PouchDB.",
-  "version": "0.5.1",
+  "version": "0.6.1",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [
